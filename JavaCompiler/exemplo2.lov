@@ -1,0 +1,13 @@
+main()
+begin
+    let Int numero;
+    let Int dobro;
+    
+    print "Digite um número: ";
+    read numero;
+    
+    dobro := numero * 2;
+    
+    print "O dobro é: ";
+    print dobro;
+end

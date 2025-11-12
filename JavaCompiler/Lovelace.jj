@@ -1,0 +1,225 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(Lovelace)
+
+import java.io.*;
+
+public class Lovelace {
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("Uso: java Lovelace <arquivo.lov>");
+            return;
+        }
+        
+        try {
+            Lovelace parser = new Lovelace(new FileInputStream(args[0]));
+            parser.Analise();
+            System.out.println("\nAnálise léxica concluída com sucesso!");
+        } catch (FileNotFoundException e) {
+            System.err.println("Erro: Arquivo não encontrado - " + args[0]);
+        } catch (Exception e) {
+            System.err.println("Erro durante análise: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+PARSER_END(Lovelace)
+
+/* TOKENS - IGNORAR ESPAÇOS EM BRANCO */
+SKIP: {
+    " " | "\t" | "\n" | "\r" | "\r\n"
+}
+
+/* COMENTÁRIOS */
+SKIP: {
+    <COMENTARIO_LINHA: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")?>
+  | <COMENTARIO_BLOCO: "/*" (~["*"] | "*" ~["/"])* "*/">
+}
+
+/* PALAVRAS RESERVADAS */
+TOKEN: {
+    <MAIN: "main">
+  | <BEGIN: "begin">
+  | <END: "end">
+  | <LET: "let">
+  | <IF: "if">
+  | <THEN: "then">
+  | <ELSE: "else">
+  | <WHILE: "while">
+  | <DO: "do">
+  | <PRINT: "print">
+  | <READ: "read">
+  | <RETURN: "return">
+  | <FUNCTION: "function">
+  | <PROCEDURE: "procedure">
+}
+
+/* TIPOS DE DADOS */
+TOKEN: {
+    <INT: "Int">
+  | <FLOAT: "Float">
+  | <BOOLEAN: "Boolean">
+  | <STRING: "String">
+}
+
+/* VALORES BOOLEANOS */
+TOKEN: {
+    <TRUE: "true">
+  | <FALSE: "false">
+}
+
+/* OPERADORES RELACIONAIS */
+TOKEN: {
+    <IGUAL: "==">
+  | <DIFERENTE: "!=">
+  | <MENOR: "<">
+  | <MENOR_IGUAL: "<=">
+  | <MAIOR: ">">
+  | <MAIOR_IGUAL: ">=">
+}
+
+/* OPERADORES LÓGICOS */
+TOKEN: {
+    <AND: "&&">
+  | <OR: "||">
+  | <NOT: "!">
+}
+
+/* OPERADORES ARITMÉTICOS */
+TOKEN: {
+    <MAIS: "+">
+  | <MENOS: "-">
+  | <MULT: "*">
+  | <DIV: "/">
+  | <MOD: "%">
+}
+
+/* DELIMITADORES E PONTUAÇÃO */
+TOKEN: {
+    <ABRE_PAR: "(">
+  | <FECHA_PAR: ")">
+  | <ABRE_CHAVE: "{">
+  | <FECHA_CHAVE: "}">
+  | <ABRE_COLCHETE: "[">
+  | <FECHA_COLCHETE: "]">
+  | <PONTO_VIRGULA: ";">
+  | <VIRGULA: ",">
+  | <DOIS_PONTOS: ":">
+  | <PONTO: ".">
+}
+
+/* ATRIBUIÇÃO */
+TOKEN: {
+    <ATRIBUICAO: ":=">
+}
+
+/* NÚMEROS */
+TOKEN: {
+    <NUMERO_FLOAT: (["0"-"9"])+ "." (["0"-"9"])+>
+  | <NUMERO_INT: (["0"-"9"])+>
+}
+
+/* STRING LITERAL */
+TOKEN: {
+    <STRING_LITERAL: "\"" (~["\"", "\n", "\r"])* "\"">
+}
+
+/* IDENTIFICADORES */
+TOKEN: {
+    <IDENTIFICADOR: ["a"-"z", "A"-"Z", "_"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*>
+}
+
+/* ANÁLISE LÉXICA */
+void Analise(): {
+    Token t;
+} {
+    {
+        try {
+            while (true) {
+                t = getNextToken();
+                
+                if (t.kind == EOF) break;
+                
+                switch (t.kind) {
+                    // Palavras reservadas
+                    case MAIN: System.out.println("Palavra reservada: main"); break;
+                    case BEGIN: System.out.println("Palavra reservada: begin"); break;
+                    case END: System.out.println("Palavra reservada: end"); break;
+                    case LET: System.out.println("Palavra reservada: let"); break;
+                    case IF: System.out.println("Palavra reservada: if"); break;
+                    case THEN: System.out.println("Palavra reservada: then"); break;
+                    case ELSE: System.out.println("Palavra reservada: else"); break;
+                    case WHILE: System.out.println("Palavra reservada: while"); break;
+                    case DO: System.out.println("Palavra reservada: do"); break;
+                    case PRINT: System.out.println("Palavra reservada: print"); break;
+                    case READ: System.out.println("Palavra reservada: read"); break;
+                    case RETURN: System.out.println("Palavra reservada: return"); break;
+                    case FUNCTION: System.out.println("Palavra reservada: function"); break;
+                    case PROCEDURE: System.out.println("Palavra reservada: procedure"); break;
+                    
+                    // Tipos
+                    case INT: System.out.println("Palavra reservada: Int"); break;
+                    case FLOAT: System.out.println("Palavra reservada: Float"); break;
+                    case BOOLEAN: System.out.println("Palavra reservada: Boolean"); break;
+                    case STRING: System.out.println("Palavra reservada: String"); break;
+                    
+                    // Valores booleanos
+                    case TRUE: System.out.println("Valor booleano: true"); break;
+                    case FALSE: System.out.println("Valor booleano: false"); break;
+                    
+                    // Operadores relacionais
+                    case IGUAL: System.out.println("Operador relacional: =="); break;
+                    case DIFERENTE: System.out.println("Operador relacional: !="); break;
+                    case MENOR: System.out.println("Operador relacional: <"); break;
+                    case MENOR_IGUAL: System.out.println("Operador relacional: <="); break;
+                    case MAIOR: System.out.println("Operador relacional: >"); break;
+                    case MAIOR_IGUAL: System.out.println("Operador relacional: >="); break;
+                    
+                    // Operadores lógicos
+                    case AND: System.out.println("Operador lógico: &&"); break;
+                    case OR: System.out.println("Operador lógico: ||"); break;
+                    case NOT: System.out.println("Operador lógico: !"); break;
+                    
+                    // Operadores aritméticos
+                    case MAIS: System.out.println("Operador aritmético: +"); break;
+                    case MENOS: System.out.println("Operador aritmético: -"); break;
+                    case MULT: System.out.println("Operador aritmético: *"); break;
+                    case DIV: System.out.println("Operador aritmético: /"); break;
+                    case MOD: System.out.println("Operador aritmético: %"); break;
+                    
+                    // Delimitadores
+                    case ABRE_PAR: System.out.println("Abre parênteses: ("); break;
+                    case FECHA_PAR: System.out.println("Fecha parênteses: )"); break;
+                    case ABRE_CHAVE: System.out.println("Abre chaves: {"); break;
+                    case FECHA_CHAVE: System.out.println("Fecha chaves: }"); break;
+                    case ABRE_COLCHETE: System.out.println("Abre colchetes: ["); break;
+                    case FECHA_COLCHETE: System.out.println("Fecha colchetes: ]"); break;
+                    case PONTO_VIRGULA: System.out.println("Ponto e vírgula: ;"); break;
+                    case VIRGULA: System.out.println("Vírgula: ,"); break;
+                    case DOIS_PONTOS: System.out.println("Dois pontos: :"); break;
+                    case PONTO: System.out.println("Ponto: ."); break;
+                    
+                    // Atribuição
+                    case ATRIBUICAO: System.out.println("Atribuição: :="); break;
+                    
+                    // Números
+                    case NUMERO_FLOAT: System.out.println("Número: " + t.image); break;
+                    case NUMERO_INT: System.out.println("Número: " + t.image); break;
+                    
+                    // String literal
+                    case STRING_LITERAL: System.out.println("String: " + t.image); break;
+                    
+                    // Identificador
+                    case IDENTIFICADOR: System.out.println("Identificador: " + t.image); break;
+                    
+                    default: System.out.println("Token desconhecido: " + t.image); break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro: " + e.getMessage());
+        }
+    }
+}
