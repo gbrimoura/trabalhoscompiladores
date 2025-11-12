@@ -1,36 +1,34 @@
 class CodeGen{
 
-	
-	String geraCodigo (ArvoreSintatica arv)
-	{
-		return (geraCodigo2(arv) + "PRINT");
-	}
-	String geraCodigo2 (ArvoreSintatica arv)
-	{
+    // Agora geraCodigo avalia a árvore e retorna o resultado como String.
+    String geraCodigo (ArvoreSintatica arv)
+    {
+        int resultado = eval(arv);
+        return String.valueOf(resultado);
+    }
 
-	if (arv instanceof Mult)
-		return (geraCodigo2(((Mult) arv).arg1) + 
-			geraCodigo2(((Mult) arv).arg2) +
-			"MULT\n");
+    // Função auxiliar que avalia recursivamente a árvore.
+    int eval (ArvoreSintatica arv)
+    {
+        if (arv instanceof Num)
+            return ((Num) arv).num;
 
-	if (arv instanceof Soma)
-		return (geraCodigo2(((Soma) arv).arg1) + 
-			geraCodigo2(((Soma) arv).arg2) +
-			"SUM\n");
+        if (arv instanceof Soma)
+            return eval(((Soma) arv).arg1) + eval(((Soma) arv).arg2);
 
-	if (arv instanceof Sub)
-		return (geraCodigo2(((Sub) arv).arg1) + 
-			geraCodigo2(((Sub) arv).arg2) +
-			"SUB\n");
-	
-	if (arv instanceof Div)
-		return (geraCodigo2(((Div) arv).arg1) + 
-			geraCodigo2(((Div) arv).arg2) +
-			"DIV\n");
+        if (arv instanceof Mult)
+            return eval(((Mult) arv).arg1) * eval(((Mult) arv).arg2);
 
-	if (arv instanceof Num)
-		return ("PUSH "  + ((Num) arv).num + "\n");
+        if (arv instanceof Sub)
+            return eval(((Sub) arv).arg1) - eval(((Sub) arv).arg2);
 
-	return "";
-	}
+        if (arv instanceof Div) {
+            int right = eval(((Div) arv).arg2);
+            if (right == 0)
+                throw new RuntimeException("Divisão por zero");
+            return eval(((Div) arv).arg1) / right;
+        }
+
+        throw new RuntimeException("Nó inválido na árvore sintática");
+    }
 }
