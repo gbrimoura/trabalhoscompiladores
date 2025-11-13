@@ -1,13 +1,11 @@
 class CodeGen{
 
-    // Agora geraCodigo avalia a árvore e retorna o resultado como String.
     String geraCodigo (ArvoreSintatica arv)
     {
         int resultado = eval(arv);
         return String.valueOf(resultado);
     }
 
-    // Função auxiliar que avalia recursivamente a árvore.
     int eval (ArvoreSintatica arv)
     {
         if (arv instanceof Num)
