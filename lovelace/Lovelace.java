@@ -31,75 +31,49 @@ public class Lovelace implements LovelaceConstants {
 
                 switch (t.kind) {
                     // Palavras reservadas
-                    case MAIN: System.out.println("Palavra reservada: main"); break;
+                     case MAIN: System.out.println("Palavra reservada: main"); break;
                     case BEGIN: System.out.println("Palavra reservada: begin"); break;
                     case END: System.out.println("Palavra reservada: end"); break;
                     case LET: System.out.println("Palavra reservada: let"); break;
                     case IF: System.out.println("Palavra reservada: if"); break;
-                    case THEN: System.out.println("Palavra reservada: then"); break;
-                    case ELSE: System.out.println("Palavra reservada: else"); break;
                     case WHILE: System.out.println("Palavra reservada: while"); break;
-                    case DO: System.out.println("Palavra reservada: do"); break;
-                    case PRINT: System.out.println("Palavra reservada: print"); break;
                     case READ: System.out.println("Palavra reservada: read"); break;
                     case RETURN: System.out.println("Palavra reservada: return"); break;
-                    case FUNCTION: System.out.println("Palavra reservada: function"); break;
-                    case PROCEDURE: System.out.println("Palavra reservada: procedure"); break;
+                    case PRINT: System.out.println("Palavra reservada: print"); break;
+                    case DEF: System.out.println("Palavra reservada: def"); break;
 
                     // Tipos
-                    case INT: System.out.println("Palavra reservada: Int"); break;
-                    case FLOAT: System.out.println("Palavra reservada: Float"); break;
-                    case BOOLEAN: System.out.println("Palavra reservada: Boolean"); break;
-                    case STRING: System.out.println("Palavra reservada: String"); break;
+                    case FLOAT_TYPE: System.out.println("Tipo: Float"); break;
+                    case BOOL_TYPE: System.out.println("Tipo: Bool"); break;
+                    case VOID_TYPE: System.out.println("Tipo: Void"); break;
 
                     // Valores booleanos
                     case TRUE: System.out.println("Valor booleano: true"); break;
                     case FALSE: System.out.println("Valor booleano: false"); break;
 
-                    // Operadores relacionais
-                    case IGUAL: System.out.println("Operador relacional: =="); break;
-                    case DIFERENTE: System.out.println("Operador relacional: !="); break;
-                    case MENOR: System.out.println("Operador relacional: <"); break;
-                    case MENOR_IGUAL: System.out.println("Operador relacional: <="); break;
-                    case MAIOR: System.out.println("Operador relacional: >"); break;
-                    case MAIOR_IGUAL: System.out.println("Operador relacional: >="); break;
-
-                    // Operadores lógicos
-                    case AND: System.out.println("Operador l\u00f3gico: &&"); break;
-                    case OR: System.out.println("Operador l\u00f3gico: ||"); break;
-                    case NOT: System.out.println("Operador l\u00f3gico: !"); break;
-
-                    // Operadores aritméticos
-                    case MAIS: System.out.println("Operador aritm\u00e9tico: +"); break;
-                    case MENOS: System.out.println("Operador aritm\u00e9tico: -"); break;
+                    // Operadores
+                    case PLUS: System.out.println("Operador aritm\u00e9tico: +"); break;
+                    case MINUS: System.out.println("Operador aritm\u00e9tico: -"); break;
                     case MULT: System.out.println("Operador aritm\u00e9tico: *"); break;
                     case DIV: System.out.println("Operador aritm\u00e9tico: /"); break;
-                    case MOD: System.out.println("Operador aritm\u00e9tico: %"); break;
+                    case AND: System.out.println("Operador l\u00f3gico: &&"); break;
+                    case OR: System.out.println("Operador l\u00f3gico: ||"); break;
+                    case EQEQ: System.out.println("Operador relacional: =="); break;
+                    case LT: System.out.println("Operador relacional: <"); break;
+                    case GT: System.out.println("Operador relacional: >"); break;
+                    case ATTR: System.out.println("Operador de atribui\u00e7\u00e3o: :="); break;
 
-                    // Delimitadores
-                    case ABRE_PAR: System.out.println("Abre par\u00eanteses: ("); break;
-                    case FECHA_PAR: System.out.println("Fecha par\u00eanteses: )"); break;
-                    case ABRE_CHAVE: System.out.println("Abre chaves: {"); break;
-                    case FECHA_CHAVE: System.out.println("Fecha chaves: }"); break;
-                    case ABRE_COLCHETE: System.out.println("Abre colchetes: ["); break;
-                    case FECHA_COLCHETE: System.out.println("Fecha colchetes: ]"); break;
-                    case PONTO_VIRGULA: System.out.println("Ponto e v\u00edrgula: ;"); break;
-                    case VIRGULA: System.out.println("V\u00edrgula: ,"); break;
-                    case DOIS_PONTOS: System.out.println("Dois pontos: :"); break;
-                    case PONTO: System.out.println("Ponto: ."); break;
-
-                    // Atribuição
-                    case ATRIBUICAO: System.out.println("Atribui\u00e7\u00e3o: :="); break;
-
-                    // Números
-                    case NUMERO_FLOAT: System.out.println("N\u00famero: " + t.image); break;
-                    case NUMERO_INT: System.out.println("N\u00famero: " + t.image); break;
-
-                    // String literal
-                    case STRING_LITERAL: System.out.println("String: " + t.image); break;
+                    // Delimitadores e pontuação
+                    case LPAREN: System.out.println("Abre par\u00eanteses: ("); break;
+                    case RPAREN: System.out.println("Fecha par\u00eanteses: )"); break;
+                    case COMMA: System.out.println("V\u00edrgula: ,"); break;
+                    case SEMI: System.out.println("Ponto e v\u00edrgula: ;"); break;
 
                     // Identificador
-                    case IDENTIFICADOR: System.out.println("Identificador: " + t.image); break;
+                    case ID: System.out.println("Identificador: " + t.image); break;
+
+                    // Número literal
+                    case NUM_LITERAL: System.out.println("N\u00famero literal: " + t.image); break;
 
                     default: System.out.println("Token desconhecido: " + t.image); break;
                 }
@@ -107,6 +81,340 @@ public class Lovelace implements LovelaceConstants {
         } catch (Exception e) {
             System.err.println("Erro: " + e.getMessage());
         }
+  }
+
+/* Função inicial */
+  final public void LOVELACE() throws ParseException {
+    MAIN_PROD();
+    FUNC_LIST();
+    jj_consume_token(0);
+  }
+
+/* MAIN -> "main" "(" ")" "begin" VARDECL SEQCOMANDOS "end" */
+  final public void MAIN_PROD() throws ParseException {
+    jj_consume_token(MAIN);
+    jj_consume_token(LPAREN);
+    jj_consume_token(RPAREN);
+    jj_consume_token(BEGIN);
+    VARDECL();
+    SEQCOMANDOS();
+    jj_consume_token(END);
+  }
+
+/* VARDECL -> VARDECL "let" TIPO TOKEN_id ";" | vazio
+   Implementado como zero ou mais declarações */
+  final public void VARDECL() throws ParseException {
+    label_1:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LET:
+        ;
+        break;
+      default:
+        jj_la1[0] = jj_gen;
+        break label_1;
+      }
+      jj_consume_token(LET);
+      TIPO();
+      jj_consume_token(ID);
+      jj_consume_token(SEMI);
+    }
+  }
+
+/* TIPO -> "Float" | "Bool" | "Void" */
+  final public void TIPO() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FLOAT_TYPE:
+      jj_consume_token(FLOAT_TYPE);
+      break;
+    case BOOL_TYPE:
+      jj_consume_token(BOOL_TYPE);
+      break;
+    case VOID_TYPE:
+      jj_consume_token(VOID_TYPE);
+      break;
+    default:
+      jj_la1[1] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+/* SEQCOMANDOS -> SEQCOMANDOS COMANDO | vazio
+   Implementado como zero ou mais comandos */
+  final public void SEQCOMANDOS() throws ParseException {
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case IF:
+      case WHILE:
+      case RETURN:
+      case PRINT:
+      case ID:
+        ;
+        break;
+      default:
+        jj_la1[2] = jj_gen;
+        break label_2;
+      }
+      COMANDO();
+    }
+  }
+
+/* COMANDO -> TOKEN_id ":=" EXP ";"
+            | TOKEN_id "(" LISTAEXP? ")" ";"
+            | "if" EXP "begin" SEQCOMANDOS "end" ";"
+            | "while" EXP "begin" SEQCOMANDOS "end" ";"
+            | TOKEN_id ":=" "read" "(" ")" ";"
+            | "return" EXP ";"
+            | "print" EXP ";" */
+  final public void COMANDO() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ID:
+      jj_consume_token(ID);
+      jj_consume_token(ATTR);
+      EXP();
+      jj_consume_token(SEMI);
+      break;
+      jj_consume_token(ID);
+      jj_consume_token(LPAREN);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LPAREN:
+      case TRUE:
+      case FALSE:
+      case ID:
+      case NUM_LITERAL:
+        LISTAEXP();
+        break;
+      default:
+        jj_la1[3] = jj_gen;
+        ;
+      }
+      jj_consume_token(RPAREN);
+      jj_consume_token(SEMI);
+      break;
+    case IF:
+      jj_consume_token(IF);
+      EXP();
+      jj_consume_token(BEGIN);
+      SEQCOMANDOS();
+      jj_consume_token(END);
+      jj_consume_token(SEMI);
+      break;
+    case WHILE:
+      jj_consume_token(WHILE);
+      EXP();
+      jj_consume_token(BEGIN);
+      SEQCOMANDOS();
+      jj_consume_token(END);
+      jj_consume_token(SEMI);
+      break;
+      jj_consume_token(ID);
+      jj_consume_token(ATTR);
+      jj_consume_token(READ);
+      jj_consume_token(LPAREN);
+      jj_consume_token(RPAREN);
+      jj_consume_token(SEMI);
+      break;
+    case RETURN:
+      jj_consume_token(RETURN);
+      EXP();
+      jj_consume_token(SEMI);
+      break;
+    case PRINT:
+      jj_consume_token(PRINT);
+      EXP();
+      jj_consume_token(SEMI);
+      break;
+    default:
+      jj_la1[4] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+/* EXP -> "(" EXP OP EXP ")" | FATOR */
+  final public void EXP() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LPAREN:
+      jj_consume_token(LPAREN);
+      EXP();
+      OP();
+      EXP();
+      jj_consume_token(RPAREN);
+      break;
+    case TRUE:
+    case FALSE:
+    case ID:
+    case NUM_LITERAL:
+      FATOR();
+      break;
+    default:
+      jj_la1[5] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+/* FATOR -> TOKEN_id | TOKEN_id "(" LISTAEXP? ")"
+           | TOKEN_numliteral | "true" | "false" */
+  final public void FATOR() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ID:
+      jj_consume_token(ID);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LPAREN:
+        jj_consume_token(LPAREN);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case LPAREN:
+        case TRUE:
+        case FALSE:
+        case ID:
+        case NUM_LITERAL:
+          LISTAEXP();
+          break;
+        default:
+          jj_la1[6] = jj_gen;
+          ;
+        }
+        jj_consume_token(RPAREN);
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        ;
+      }
+      break;
+    case NUM_LITERAL:
+      jj_consume_token(NUM_LITERAL);
+      break;
+    case TRUE:
+      jj_consume_token(TRUE);
+      break;
+    case FALSE:
+      jj_consume_token(FALSE);
+      break;
+    default:
+      jj_la1[8] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+/* OP -> "+" | "-" | "*" | "/" | "&&" | "||" | "<" | ">" | "==" */
+  final public void OP() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case PLUS:
+      jj_consume_token(PLUS);
+      break;
+    case MINUS:
+      jj_consume_token(MINUS);
+      break;
+    case MULT:
+      jj_consume_token(MULT);
+      break;
+    case DIV:
+      jj_consume_token(DIV);
+      break;
+    case AND:
+      jj_consume_token(AND);
+      break;
+    case OR:
+      jj_consume_token(OR);
+      break;
+    case LT:
+      jj_consume_token(LT);
+      break;
+    case GT:
+      jj_consume_token(GT);
+      break;
+    case EQEQ:
+      jj_consume_token(EQEQ);
+      break;
+    default:
+      jj_la1[9] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+/* LISTAEXP -> EXP | LISTAEXP "," EXP
+   Implementado como: EXP ("," EXP)* */
+  final public void LISTAEXP() throws ParseException {
+    EXP();
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[10] = jj_gen;
+        break label_3;
+      }
+      jj_consume_token(COMMA);
+      EXP();
+    }
+  }
+
+/* FUNC -> FUNC "def" TIPO TOKEN_id "(" LISTAARG? ")" "begin" VARDECL SEQCOMANDOS "end"
+           | "def" TIPO TOKEN_id "(" LISTAARG? ")" "begin" VARDECL SEQCOMANDOS "end"
+   Implementado como zero ou mais funções. */
+  final public void FUNC_LIST() throws ParseException {
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case DEF:
+        ;
+        break;
+      default:
+        jj_la1[11] = jj_gen;
+        break label_4;
+      }
+      FUNC();
+    }
+  }
+
+  final public void FUNC() throws ParseException {
+    jj_consume_token(DEF);
+    TIPO();
+    jj_consume_token(ID);
+    jj_consume_token(LPAREN);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FLOAT_TYPE:
+    case BOOL_TYPE:
+    case VOID_TYPE:
+      LISTAARG();
+      break;
+    default:
+      jj_la1[12] = jj_gen;
+      ;
+    }
+    jj_consume_token(RPAREN);
+    jj_consume_token(BEGIN);
+    VARDECL();
+    SEQCOMANDOS();
+    jj_consume_token(END);
+  }
+
+/* LISTAARG -> TIPO TOKEN_id | LISTAARG "," TIPO TOKEN_id
+   Implementado como: TIPO ID ("," TIPO ID)* */
+  final public void LISTAARG() throws ParseException {
+    TIPO();
+    jj_consume_token(ID);
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(COMMA);
+      TIPO();
+      jj_consume_token(ID);
+    }
   }
 
   /** Generated Token Manager. */
@@ -118,7 +426,7 @@ public class Lovelace implements LovelaceConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[0];
+  final private int[] jj_la1 = new int[14];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -126,10 +434,10 @@ public class Lovelace implements LovelaceConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {};
+      jj_la1_0 = new int[] {0x200,0x700000,0x6c00,0x1840000,0x6c00,0x1840000,0x1840000,0x40000,0x1800000,0xfe000000,0x10000,0x8000,0x700000,0x10000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {};
+      jj_la1_1 = new int[] {0x0,0x0,0x8,0x18,0x8,0x18,0x18,0x0,0x18,0x3,0x0,0x0,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -143,7 +451,7 @@ public class Lovelace implements LovelaceConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -157,7 +465,7 @@ public class Lovelace implements LovelaceConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -167,7 +475,7 @@ public class Lovelace implements LovelaceConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -177,7 +485,7 @@ public class Lovelace implements LovelaceConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -186,7 +494,7 @@ public class Lovelace implements LovelaceConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -195,7 +503,7 @@ public class Lovelace implements LovelaceConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -246,12 +554,12 @@ public class Lovelace implements LovelaceConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[57];
+    boolean[] la1tokens = new boolean[37];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 0; i++) {
+    for (int i = 0; i < 14; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -263,7 +571,7 @@ public class Lovelace implements LovelaceConstants {
         }
       }
     }
-    for (int i = 0; i < 57; i++) {
+    for (int i = 0; i < 37; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

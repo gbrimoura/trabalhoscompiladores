@@ -1,64 +1,55 @@
-function fatorial(Int n)
+def Float fatorial(Float n)
 begin
-    let Int resultado;
-    let Int contador;
-    
+    let Float resultado;
+    let Float contador;
+
     resultado := 1;
     contador := 1;
-    
-    if n < 0 then
-    begin
+
+    if (n < 0) begin
         print "Erro: número negativo";
         return -1;
-    end
-    else
-    begin
-        while contador <= n do
-        begin
-            resultado := resultado * contador;
-            contador := contador + 1;
-        end
-    end
-    
+    end;
+
+    while (contador <= n) begin
+        resultado := resultado * contador;
+        contador := contador + 1;
+    end;
+
     return resultado;
 end
 
 main()
 begin
-    let Int numero;
-    let Int resultado;
-    let Boolean continuar;
-    
+    let Float numero;
+    let Float resultado;
+    let Bool continuar;
+
     continuar := true;
-    
+
     print "=== Calculadora de Fatorial ===";
-    
-    while continuar do
-    begin
+
+    while (continuar == true) begin
         print "Digite um número (0 para sair): ";
-        read numero;
-        
-        if numero == 0 then
-        begin
+        numero := read();
+
+        if (numero == 0) begin
             continuar := false;
             print "Encerrando programa...";
         end
-        else
-        begin
-            if numero > 0 then
-            begin
+        else begin
+            if (numero > 0) begin
                 resultado := fatorial(numero);
                 print "Fatorial de ";
                 print numero;
                 print " = ";
                 print resultado;
             end
-            else
-            begin
+            else begin
                 print "Por favor, digite um número positivo";
             end
-        end
-    end
-    
+        end;
+    end;
+
     print "Programa finalizado!";
 end

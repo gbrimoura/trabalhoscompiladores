@@ -1,13 +1,13 @@
 main()
 begin
-    let Int numero;
-    let Int dobro;
-    
+    let Float numero;
+    let Float dobro;
+
     print "Digite um número: ";
-    read numero;
-    
+    numero := read();
+
     dobro := numero * 2;
-    
+
     print "O dobro é: ";
     print dobro;
 end

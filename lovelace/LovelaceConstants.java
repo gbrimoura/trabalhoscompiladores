@@ -9,107 +9,67 @@ public interface LovelaceConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int COMENTARIO_LINHA = 6;
+  int MAIN = 6;
   /** RegularExpression Id. */
-  int COMENTARIO_BLOCO = 7;
+  int BEGIN = 7;
   /** RegularExpression Id. */
-  int MAIN = 8;
+  int END = 8;
   /** RegularExpression Id. */
-  int BEGIN = 9;
+  int LET = 9;
   /** RegularExpression Id. */
-  int END = 10;
+  int IF = 10;
   /** RegularExpression Id. */
-  int LET = 11;
+  int WHILE = 11;
   /** RegularExpression Id. */
-  int IF = 12;
+  int READ = 12;
   /** RegularExpression Id. */
-  int THEN = 13;
+  int RETURN = 13;
   /** RegularExpression Id. */
-  int ELSE = 14;
+  int PRINT = 14;
   /** RegularExpression Id. */
-  int WHILE = 15;
+  int DEF = 15;
   /** RegularExpression Id. */
-  int DO = 16;
+  int COMMA = 16;
   /** RegularExpression Id. */
-  int PRINT = 17;
+  int SEMI = 17;
   /** RegularExpression Id. */
-  int READ = 18;
+  int LPAREN = 18;
   /** RegularExpression Id. */
-  int RETURN = 19;
+  int RPAREN = 19;
   /** RegularExpression Id. */
-  int FUNCTION = 20;
+  int FLOAT_TYPE = 20;
   /** RegularExpression Id. */
-  int PROCEDURE = 21;
+  int BOOL_TYPE = 21;
   /** RegularExpression Id. */
-  int INT = 22;
+  int VOID_TYPE = 22;
   /** RegularExpression Id. */
-  int FLOAT = 23;
+  int TRUE = 23;
   /** RegularExpression Id. */
-  int BOOLEAN = 24;
+  int FALSE = 24;
   /** RegularExpression Id. */
-  int STRING = 25;
+  int AND = 25;
   /** RegularExpression Id. */
-  int TRUE = 26;
+  int OR = 26;
   /** RegularExpression Id. */
-  int FALSE = 27;
+  int EQEQ = 27;
   /** RegularExpression Id. */
-  int IGUAL = 28;
+  int LT = 28;
   /** RegularExpression Id. */
-  int DIFERENTE = 29;
+  int GT = 29;
   /** RegularExpression Id. */
-  int MENOR = 30;
+  int PLUS = 30;
   /** RegularExpression Id. */
-  int MENOR_IGUAL = 31;
+  int MINUS = 31;
   /** RegularExpression Id. */
-  int MAIOR = 32;
+  int MULT = 32;
   /** RegularExpression Id. */
-  int MAIOR_IGUAL = 33;
+  int DIV = 33;
   /** RegularExpression Id. */
-  int AND = 34;
+  int ATTR = 34;
   /** RegularExpression Id. */
-  int OR = 35;
+  int ID = 35;
   /** RegularExpression Id. */
-  int NOT = 36;
-  /** RegularExpression Id. */
-  int MAIS = 37;
-  /** RegularExpression Id. */
-  int MENOS = 38;
-  /** RegularExpression Id. */
-  int MULT = 39;
-  /** RegularExpression Id. */
-  int DIV = 40;
-  /** RegularExpression Id. */
-  int MOD = 41;
-  /** RegularExpression Id. */
-  int ABRE_PAR = 42;
-  /** RegularExpression Id. */
-  int FECHA_PAR = 43;
-  /** RegularExpression Id. */
-  int ABRE_CHAVE = 44;
-  /** RegularExpression Id. */
-  int FECHA_CHAVE = 45;
-  /** RegularExpression Id. */
-  int ABRE_COLCHETE = 46;
-  /** RegularExpression Id. */
-  int FECHA_COLCHETE = 47;
-  /** RegularExpression Id. */
-  int PONTO_VIRGULA = 48;
-  /** RegularExpression Id. */
-  int VIRGULA = 49;
-  /** RegularExpression Id. */
-  int DOIS_PONTOS = 50;
-  /** RegularExpression Id. */
-  int PONTO = 51;
-  /** RegularExpression Id. */
-  int ATRIBUICAO = 52;
-  /** RegularExpression Id. */
-  int NUMERO_FLOAT = 53;
-  /** RegularExpression Id. */
-  int NUMERO_INT = 54;
-  /** RegularExpression Id. */
-  int STRING_LITERAL = 55;
-  /** RegularExpression Id. */
-  int IDENTIFICADOR = 56;
+  int NUM_LITERAL = 36;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -122,57 +82,37 @@ public interface LovelaceConstants {
     "\"\\n\"",
     "\"\\r\"",
     "\"\\r\\n\"",
-    "<COMENTARIO_LINHA>",
-    "<COMENTARIO_BLOCO>",
     "\"main\"",
     "\"begin\"",
     "\"end\"",
     "\"let\"",
     "\"if\"",
-    "\"then\"",
-    "\"else\"",
     "\"while\"",
-    "\"do\"",
-    "\"print\"",
     "\"read\"",
     "\"return\"",
-    "\"function\"",
-    "\"procedure\"",
-    "\"Int\"",
+    "\"print\"",
+    "\"def\"",
+    "\",\"",
+    "\";\"",
+    "\"(\"",
+    "\")\"",
     "\"Float\"",
-    "\"Boolean\"",
-    "\"String\"",
+    "\"Bool\"",
+    "\"Void\"",
     "\"true\"",
     "\"false\"",
-    "\"==\"",
-    "\"!=\"",
-    "\"<\"",
-    "\"<=\"",
-    "\">\"",
-    "\">=\"",
     "\"&&\"",
     "\"||\"",
-    "\"!\"",
+    "\"==\"",
+    "\"<\"",
+    "\">\"",
     "\"+\"",
     "\"-\"",
     "\"*\"",
     "\"/\"",
-    "\"%\"",
-    "\"(\"",
-    "\")\"",
-    "\"{\"",
-    "\"}\"",
-    "\"[\"",
-    "\"]\"",
-    "\";\"",
-    "\",\"",
-    "\":\"",
-    "\".\"",
     "\":=\"",
-    "<NUMERO_FLOAT>",
-    "<NUMERO_INT>",
-    "<STRING_LITERAL>",
-    "<IDENTIFICADOR>",
+    "<ID>",
+    "<NUM_LITERAL>",
   };
 
 }
