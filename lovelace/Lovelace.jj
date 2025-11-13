@@ -53,7 +53,7 @@ TOKEN: {
   | <PRINT: "print">
   | <READ: "read">
   | <RETURN: "return">
-  | <FUNCTION: "function">
+  | <DEF: "def">
   | <PROCEDURE: "procedure">
 }
 
@@ -157,7 +157,7 @@ void Analise(): {
                     case PRINT: System.out.println("Palavra reservada: print"); break;
                     case READ: System.out.println("Palavra reservada: read"); break;
                     case RETURN: System.out.println("Palavra reservada: return"); break;
-                    case FUNCTION: System.out.println("Palavra reservada: function"); break;
+                    case DEF: System.out.println("Palavra reservada: def"); break;
                     case PROCEDURE: System.out.println("Palavra reservada: procedure"); break;
                     
                     // Tipos
@@ -306,5 +306,66 @@ void Com() :
 | <IDENTIFICADOR> <ATRIBUICAO> <READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
 | <RETURN> Exp() <PONTO_VIRGULA>
 | <PRINT> Exp() <PONTO_VIRGULA>
+
+}
+
+void Exp() :
+{}
+{
+
+<ABRE_PAR> ExpD() Op() ExpD() <FECHA_PAR>
+| <FATOR>
+
+}
+
+void ExpD() :
+{}
+{
+
+<FATOR> ExpDD()
+
+}
+
+void ExpDD() :
+{}
+{
+
+(Op() Exp())?
+
+}
+
+void Op() :
+{}
+{
+
+<MAIS>
+| <MENOS>
+| <MULT>
+| <DIV>
+| <MOD>
+
+}
+
+void ListaExp() :
+{}
+{
+
+Exp() ListaExpL()
+
+}
+
+void ListaExpL() :
+{}
+{
+
+(<VIRGULA> Exp() ListaExpL())?
+
+}
+
+void Func() :
+{}
+{
+
+<DEF> 
 
 }
