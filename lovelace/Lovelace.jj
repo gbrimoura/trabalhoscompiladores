@@ -247,15 +247,31 @@ void Com() :
 {}
 {
 
-<IDENTIFICADOR> <ATRIBUICAO> Exp() <PONTO_VIRGULA>
-| <IDENTIFICADOR> <ABRE_PAR> (ListaExp())? <FECHA_PAR> <PONTO_VIRGULA>
+<IDENTIFICADOR> ComId()
 | <IF> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
 | <WHILE> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
-| <IDENTIFICADOR> <ATRIBUICAO> <READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
 | <RETURN> Exp() <PONTO_VIRGULA>
 | <PRINT> Exp() <PONTO_VIRGULA>
 
 }
+
+void ComId() : 
+{}
+{
+
+<ATRIBUICAO> ComIdPar()
+| <ABRE_PAR> (ListaExp())? <FECHA_PAR> <PONTO_VIRGULA>
+
+}
+
+void ComIdPar() :
+{}
+{
+
+Exp() <PONTO_VIRGULA>
+|<READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
+
+} 
 
 void Exp() :
 {}
@@ -286,11 +302,18 @@ void Fator() :
 {}
 {
 
-<IDENTIFICADOR>
-| <IDENTIFICADOR> <ABRE_PAR> (ListaExp()) <FECHA_PAR>
+<IDENTIFICADOR> FatorId()
 | <NUM>
 | <TRUE>
 | <FALSE>
+
+}
+
+void FatorId() :
+{}
+{
+
+(<ABRE_PAR> (ListaExp()) <FECHA_PAR>)?
 
 }
 
