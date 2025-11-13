@@ -223,3 +223,88 @@ void Analise(): {
         }
     }
 }
+
+/* ANÁLISE SINTÁTICA */
+
+// Função inicial Lovelace
+void Lovelace () :
+{}
+{
+
+LovMain() Funcs()
+<EOF>
+}
+
+// Main
+void LovMain () :
+{}
+{
+
+<MAIN> <ABRE_PAR> <FECHA_PAR> <BEGIN> VarDecls() SeqComandos() <END>
+
+}
+
+void VarDecls () :
+{}
+{
+
+VarDecl() <PONTO_VIRGULA> VarDeclsL()
+
+}
+
+void VarDeclsL() :
+{}
+{
+
+( VarDecl() <PONTO_VIRGULA> VarDeclsL())?
+
+}
+
+void VarDecl() :
+{}
+{
+
+<LET> Tipo() <IDENTIFICADOR> <PONTO_VIRGULA>
+
+}
+
+void Tipo() :
+{}
+{
+
+<INT>
+| <FLOAT>
+| <BOOLEAN>
+| <STRING>
+
+}
+
+void SeqComandos() :
+{}
+{
+
+Com() SeqComandosL()
+
+}
+
+void SeqComandosL() :
+{}
+{
+
+(Com() SeqComandosL())?
+
+}
+
+void Com() :
+{}
+{
+
+<IDENTIFICADOR> <ATRIBUICAO> Exp() <PONTO_VIRGULA>
+| <IDENTIFICADOR> <ABRE_PAR> (ListaExp())? <FECHA_PAR> <PONTO_VIRGULA>
+| <IF> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
+| <WHILE> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
+| <IDENTIFICADOR> <ATRIBUICAO> <READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
+| <RETURN> Exp() <PONTO_VIRGULA>
+| <PRINT> Exp() <PONTO_VIRGULA>
+
+}
