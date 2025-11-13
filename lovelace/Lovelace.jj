@@ -17,6 +17,8 @@ public class Lovelace {
             Lovelace parser = new Lovelace(new FileInputStream(args[0]));
             parser.Analise();
             System.out.println("\nAnálise léxica concluída com sucesso!");
+	    parser.Lovelace();
+            System.out.println("\nAnálise sintática concluída com sucesso!");
         } catch (FileNotFoundException e) {
             System.err.println("Erro: Arquivo não encontrado - " + args[0]);
         } catch (Exception e) {
@@ -47,17 +49,17 @@ TOKEN : {
   | < RETURN: "return" >
   | < PRINT: "print" >
   | < DEF: "def" >
-  | < COMMA: "," >
-  | < SEMI: ";" >
-  | < LPAREN: "(" >
-  | < RPAREN: ")" >
+  | < VIRGULA: "," >
+  | < PONTO_VIRGULA: ";" >
+  | < ABRE_PAR: "(" >
+  | < FECHA_PAR: ")" >
 }
 
 /* tipos literais */
 TOKEN : {
-    < FLOAT_TYPE: "Float" >
-  | < BOOL_TYPE: "Bool" >
-  | < VOID_TYPE: "Void" >
+    < FLOAT: "Float" >
+  | < BOOLEAN: "Bool" >
+  | < VOID: "Void" >
 }
 
 /* booleanos literais */
@@ -70,18 +72,18 @@ TOKEN : {
 TOKEN : {
     < AND: "&&" >
   | < OR: "||" >
-  | < EQEQ: "==" >
-  | < LT: "<" >
-  | < GT: ">" >
-  | < PLUS: "+" >
-  | < MINUS: "-" >
+  | < IGUAL: "==" >
+  | < MENOR: "<" >
+  | < MAIOR: ">" >
+  | < MAIS: "+" >
+  | < MENOS: "-" >
   | < MULT: "*" >
   | < DIV: "/" >
 }
 
 /* atribuição token (:=) e vírgula já acima */
 TOKEN : {
-    < ATTR: ":=" >
+    < ATRIBUICAO: ":=" >
 }
 
 /* identificador conforme convenção:
@@ -89,7 +91,7 @@ TOKEN : {
    - permite partes finais com underscore seguidas de letras/dígitos
 */
 TOKEN : {
-    < ID:
+    < IDENTIFICADOR:
         (["a"-"z","A"-"Z"]) 
         (["a"-"z","A"-"Z","0"-"9"])*
         ( ("_" (["a"-"z","A"-"Z","0"-"9"])+ ) )*
@@ -98,7 +100,7 @@ TOKEN : {
 
 /* número literal: digitos ( .digitos )? ( [Ee] (+|-)? digitos )? */
 TOKEN : {
-    < NUM_LITERAL:
+    < NUM:
         (["0"-"9"])+
         ( "." (["0"-"9"])+ )?
         ( ["E","e"] (["+","-"])? (["0"-"9"])+ )?
@@ -130,37 +132,37 @@ void Analise(): {
                     case DEF: System.out.println("Palavra reservada: def"); break;
                     
                     // Tipos
-                    case FLOAT_TYPE: System.out.println("Tipo: Float"); break;
-                    case BOOL_TYPE: System.out.println("Tipo: Bool"); break;
-                    case VOID_TYPE: System.out.println("Tipo: Void"); break;
+                    case FLOAT: System.out.println("Tipo: Float"); break;
+                    case BOOLEAN: System.out.println("Tipo: Bool"); break;
+                    case VOID: System.out.println("Tipo: Void"); break;
                     
                     // Valores booleanos
                     case TRUE: System.out.println("Valor booleano: true"); break;
                     case FALSE: System.out.println("Valor booleano: false"); break;
                     
                     // Operadores
-                    case PLUS: System.out.println("Operador aritmético: +"); break;
-                    case MINUS: System.out.println("Operador aritmético: -"); break;
+                    case MAIS: System.out.println("Operador aritmético: +"); break;
+                    case MENOS: System.out.println("Operador aritmético: -"); break;
                     case MULT: System.out.println("Operador aritmético: *"); break;
                     case DIV: System.out.println("Operador aritmético: /"); break;
                     case AND: System.out.println("Operador lógico: &&"); break;
                     case OR: System.out.println("Operador lógico: ||"); break;
-                    case EQEQ: System.out.println("Operador relacional: =="); break;
-                    case LT: System.out.println("Operador relacional: <"); break;
-                    case GT: System.out.println("Operador relacional: >"); break;
-                    case ATTR: System.out.println("Operador de atribuição: :="); break;
+                    case IGUAL: System.out.println("Operador relacional: =="); break;
+                    case MENOR: System.out.println("Operador relacional: <"); break;
+                    case MAIOR: System.out.println("Operador relacional: >"); break;
+                    case ATRIBUICAO: System.out.println("Operador de atribuição: :="); break;
 
                     // Delimitadores e pontuação
-                    case LPAREN: System.out.println("Abre parênteses: ("); break;
-                    case RPAREN: System.out.println("Fecha parênteses: )"); break;
-                    case COMMA: System.out.println("Vírgula: ,"); break;
-                    case SEMI: System.out.println("Ponto e vírgula: ;"); break;
+                    case ABRE_PAR: System.out.println("Abre parênteses: ("); break;
+                    case FECHA_PAR: System.out.println("Fecha parênteses: )"); break;
+                    case VIRGULA: System.out.println("Vírgula: ,"); break;
+                    case PONTO_VIRGULA: System.out.println("Ponto e vírgula: ;"); break;
 
                     // Identificador
-                    case ID: System.out.println("Identificador: " + t.image); break;
+                    case IDENTIFICADOR: System.out.println("Identificador: " + t.image); break;
 
                     // Número literal
-                    case NUM_LITERAL: System.out.println("Número literal: " + t.image); break;
+                    case NUM: System.out.println("Número: " + t.image); break;
 
                     default: System.out.println("Token desconhecido: " + t.image); break;
                 }
@@ -171,123 +173,183 @@ void Analise(): {
     }
 }
 
-/* Função inicial */
-void LOVELACE() :
+/* ANÁLISE SINTÁTICA */
+
+// Função inicial Lovelace
+void Lovelace () :
 {}
 {
-    MAIN_PROD() FUNC_LIST() <EOF>
+
+LovMain() (Func())?
+<EOF>
 }
 
-/* MAIN -> "main" "(" ")" "begin" VARDECL SEQCOMANDOS "end" */
-void MAIN_PROD() :
+// Main
+void LovMain () :
 {}
 {
-    <MAIN> <LPAREN> <RPAREN> <BEGIN> VARDECL() SEQCOMANDOS() <END>
+
+<MAIN> <ABRE_PAR> <FECHA_PAR> <BEGIN> VarDecls() SeqComandos() <END>
+
 }
 
-/* VARDECL -> VARDECL "let" TIPO TOKEN_id ";" | vazio
-   Implementado como zero ou mais declarações */
-void VARDECL() :
+void VarDecls () :
 {}
 {
-    ( <LET> TIPO() <ID> <SEMI> )*
+
+VarDecl() <PONTO_VIRGULA> VarDeclsL()
+
 }
 
-/* TIPO -> "Float" | "Bool" | "Void" */
-void TIPO() :
+void VarDeclsL() :
 {}
 {
-    <FLOAT_TYPE> | <BOOL_TYPE> | <VOID_TYPE>
+
+( VarDecl() <PONTO_VIRGULA> VarDeclsL())?
+
 }
 
-/* SEQCOMANDOS -> SEQCOMANDOS COMANDO | vazio
-   Implementado como zero ou mais comandos */
-void SEQCOMANDOS() :
+void VarDecl() :
 {}
 {
-    ( COMANDO() )*
+
+<LET> Tipo() <IDENTIFICADOR> <PONTO_VIRGULA>
+
 }
 
-/* COMANDO -> TOKEN_id ":=" EXP ";"
-            | TOKEN_id "(" LISTAEXP? ")" ";"
-            | "if" EXP "begin" SEQCOMANDOS "end" ";"
-            | "while" EXP "begin" SEQCOMANDOS "end" ";"
-            | TOKEN_id ":=" "read" "(" ")" ";"
-            | "return" EXP ";"
-            | "print" EXP ";" */
-void COMANDO() :
+void Tipo() :
 {}
 {
-      ( <ID> <ATTR> EXP() <SEMI> )
-    | ( <ID> <LPAREN> ( LISTAEXP() )? <RPAREN> <SEMI> )
-    | ( <IF> EXP() <BEGIN> SEQCOMANDOS() <END> <SEMI> )
-    | ( <WHILE> EXP() <BEGIN> SEQCOMANDOS() <END> <SEMI> )
-    | ( <ID> <ATTR> <READ> <LPAREN> <RPAREN> <SEMI> )
-    | ( <RETURN> EXP() <SEMI> )
-    | ( <PRINT> EXP() <SEMI> )
+
+<FLOAT>
+| <BOOLEAN>
+| <VOID>
+
 }
 
-/* EXP -> "(" EXP OP EXP ")" | FATOR */
-void EXP() :
+void SeqComandos() :
 {}
 {
-      ( <LPAREN> EXP() OP() EXP() <RPAREN> )
-    | FATOR()
+
+Com() SeqComandosL()
+
 }
 
-/* FATOR -> TOKEN_id | TOKEN_id "(" LISTAEXP? ")"
-           | TOKEN_numliteral | "true" | "false" */
-void FATOR() :
+void SeqComandosL() :
 {}
 {
-      ( <ID> ( <LPAREN> ( LISTAEXP() )? <RPAREN> )? )
-    | <NUM_LITERAL>
-    | <TRUE>
-    | <FALSE>
+
+(Com() SeqComandosL())?
+
 }
 
-/* OP -> "+" | "-" | "*" | "/" | "&&" | "||" | "<" | ">" | "==" */
-void OP() :
+void Com() :
 {}
 {
-      <PLUS>
-    | <MINUS>
-    | <MULT>
-    | <DIV>
-    | <AND>
-    | <OR>
-    | <LT>
-    | <GT>
-    | <EQEQ>
+
+<IDENTIFICADOR> <ATRIBUICAO> Exp() <PONTO_VIRGULA>
+| <IDENTIFICADOR> <ABRE_PAR> (ListaExp())? <FECHA_PAR> <PONTO_VIRGULA>
+| <IF> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
+| <WHILE> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
+| <IDENTIFICADOR> <ATRIBUICAO> <READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
+| <RETURN> Exp() <PONTO_VIRGULA>
+| <PRINT> Exp() <PONTO_VIRGULA>
+
 }
 
-/* LISTAEXP -> EXP | LISTAEXP "," EXP
-   Implementado como: EXP ("," EXP)* */
-void LISTAEXP() :
+void Exp() :
 {}
 {
-    EXP() ( <COMMA> EXP() )*
+
+<ABRE_PAR> ExpD() Op() ExpD() <FECHA_PAR>
+| Fator()
+
 }
 
-/* FUNC -> FUNC "def" TIPO TOKEN_id "(" LISTAARG? ")" "begin" VARDECL SEQCOMANDOS "end"
-           | "def" TIPO TOKEN_id "(" LISTAARG? ")" "begin" VARDECL SEQCOMANDOS "end"
-   Implementado como zero ou mais funções. */
-void FUNC_LIST() :
+void ExpD() :
 {}
 {
-    ( FUNC() )*
+
+Fator() ExpDD()
+
 }
 
-void FUNC() :
+void ExpDD() :
 {}
 {
-    <DEF> TIPO() <ID> <LPAREN> ( LISTAARG() )? <RPAREN> <BEGIN> VARDECL() SEQCOMANDOS() <END>
+
+(Op() Exp())?
+
 }
 
-/* LISTAARG -> TIPO TOKEN_id | LISTAARG "," TIPO TOKEN_id
-   Implementado como: TIPO ID ("," TIPO ID)* */
-void LISTAARG() :
+void Fator() :
 {}
 {
-    TIPO() <ID> ( <COMMA> TIPO() <ID> )*
+
+<IDENTIFICADOR>
+| <IDENTIFICADOR> <ABRE_PAR> (ListaExp()) <FECHA_PAR>
+| <NUM>
+| <TRUE>
+| <FALSE>
+
+}
+
+void Op() :
+{}
+{
+
+<MAIS>
+| <MENOS>
+| <MULT>
+| <DIV>
+
+}
+
+void ListaExp() :
+{}
+{
+
+Exp() ListaExpL()
+
+}
+
+void ListaExpL() :
+{}
+{
+
+(<VIRGULA> Exp() ListaExpL())?
+
+}
+
+void Func() :
+{}
+{
+
+<DEF> Tipo() <IDENTIFICADOR> <ABRE_PAR> (ListaArg())? <FECHA_PAR> <BEGIN> VarDecls() SeqComandos()
+<END> FuncL()
+
+}
+
+void FuncL() :
+{}
+{
+
+(Func() FuncL())?
+
+}
+
+void ListaArg() :
+{}
+{
+
+Tipo() <IDENTIFICADOR> ListaArgL()
+
+}
+
+void ListaArgL() :
+{}
+{
+
+(<VIRGULA> Tipo() <IDENTIFICADOR> ListaArgL())?
+
 }
