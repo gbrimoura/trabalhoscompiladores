@@ -5,6 +5,7 @@ options {
 PARSER_BEGIN(Lovelace)
 
 import java.io.*;
+import ast.*;
 
 public class Lovelace {
     public static void main(String[] args) {
