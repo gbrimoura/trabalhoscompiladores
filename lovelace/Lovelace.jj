@@ -18,8 +18,9 @@ public class Lovelace {
             Lovelace parser = new Lovelace(new FileInputStream(args[0]));
             parser.Analise();
             System.out.println("\nAnálise léxica concluída com sucesso!");
-	    parser.Lovelace();
+	    Prog arvore = parser.Lovelace();
             System.out.println("\nAnálise sintática concluída com sucesso!");
+	    geraCodigo(arvore, args[0]);
         } catch (FileNotFoundException e) {
             System.err.println("Erro: Arquivo não encontrado - " + args[0]);
         } catch (Exception e) {
@@ -27,6 +28,10 @@ public class Lovelace {
             e.printStackTrace();
         }
     }
+}
+
+public static void geraCodigo(Prog prog, String arquivo) {
+
 }
 
 PARSER_END(Lovelace)
@@ -177,44 +182,42 @@ void Analise(): {
 /* ANÁLISE SINTÁTICA */
 
 // Função inicial Lovelace
-void Lovelace () :
-{}
+Prog Lovelace () :
+{Main main=null; ArrayList<Fun> funs = null;}
 {
 
-LovMain() (Func())?
+main=LovMain() (funs=Func())?
 <EOF>
+
+{return new Prog(main,funs);}
+
 }
 
 // Main
-void LovMain () :
-{}
+Main LovMain () :
+{public ArrayList<VarDecl> vars=null;
+ public ArrayList<Comando> coms=null;}
 {
 
-<MAIN> <ABRE_PAR> <FECHA_PAR> <BEGIN> VarDecls() SeqComandos() <END>
+<MAIN> <ABRE_PAR> <FECHA_PAR> <BEGIN> vars=VarDecls() coms=SeqComandos() <END>
 
+{return new Main(vars,coms);}
 }
 
-void VarDecls () :
-{}
+
+ArrayList<VarDecl> VarDecls() :
+{ArrayList<VarDecl> decls = new ArrayList<VarDecl>(); String nome=null; String tipo=null;} // Lista dos comandos na classe designada
 {
 
-VarDecl() <PONTO_VIRGULA> VarDeclsL()
+(<LET> tipo=Tipo() nome=<IDENTIFICADOR> <PONTO_VIRGULA>
 
-}
+ {
+     decls.add(new VarDecl(tipo,nome.image);)
 
-void VarDeclsL() :
-{}
-{
+ }
+)*
 
-( VarDecl() <PONTO_VIRGULA> VarDeclsL())?
-
-}
-
-void VarDecl() :
-{}
-{
-
-<LET> Tipo() <IDENTIFICADOR> <PONTO_VIRGULA>
+{return decls;}
 
 }
 
@@ -228,24 +231,25 @@ void Tipo() :
 
 }
 
-void SeqComandos() :
-{}
+ArrayList<Comando> SeqComandos() :
+{ArrayList<Comando> comandos = new ArrayList<Comando>();}  // Lista dos comandos na classe designada
 {
 
-Com() SeqComandosL()
+//Com() SeqComandosL()
+Com()*
 
 }
 
-void SeqComandosL() :
+/*void SeqComandosL() :
 {}
 {
 
 (Com() SeqComandosL())?
 
-}
+}*/
 
-void Com() :
-{}
+Comando Com() :
+{Comando}
 {
 
 <IDENTIFICADOR> ComId()
@@ -256,7 +260,7 @@ void Com() :
 
 }
 
-void ComId() : 
+String ComId() : // acho que é isso, checar dps 
 {}
 {
 
