@@ -5,6 +5,9 @@ options {
 PARSER_BEGIN(Lovelace)
 
 import java.io.*;
+import java.nio.file.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import ast.*;
 
 public class Lovelace {
@@ -15,23 +18,236 @@ public class Lovelace {
         }
         
         try {
+            Lovelace lexer = new Lovelace(new FileInputStream(args[0]));
+            lexer.Analise();
+            System.out.println("\nAnalise lexica concluida com sucesso!");
+            
             Lovelace parser = new Lovelace(new FileInputStream(args[0]));
-            parser.Analise();
-            System.out.println("\nAnálise léxica concluída com sucesso!");
-	    Prog arvore = parser.Lovelace();
-            System.out.println("\nAnálise sintática concluída com sucesso!");
-	    geraCodigo(arvore, args[0]);
+            Prog arvore = parser.Lovelace();
+            System.out.println("\nAnalise sintatica concluida com sucesso!");
+            geraCodigo(arvore, args[0]);
         } catch (FileNotFoundException e) {
-            System.err.println("Erro: Arquivo não encontrado - " + args[0]);
+            System.err.println("Erro: Arquivo nao encontrado - " + args[0]);
         } catch (Exception e) {
-            System.err.println("Erro durante análise: " + e.getMessage());
+            System.err.println("Erro durante analise: " + e.getMessage());
             e.printStackTrace();
         }
     }
-}
-
-public static void geraCodigo(Prog prog, String arquivo) {
-
+    
+    public static void geraCodigo(Prog prog, String arquivo) {
+        try {
+            String codigo = gerarPrograma(prog);
+            Path outPath = Paths.get(gerarNomeSaida(arquivo));
+            Files.write(outPath, codigo.getBytes(StandardCharsets.UTF_8));
+            System.out.println("Codigo C gerado em: " + outPath.toAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("Erro ao gerar codigo: " + e.getMessage());
+        }
+    }
+    
+    private static String gerarPrograma(Prog prog) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#include <stdio.h>\n");
+        sb.append("#include <stdlib.h>\n");
+        sb.append("#include <stdbool.h>\n\n");
+        
+        Map<String, String> funReturn = new HashMap<String, String>();
+        if (prog.fun != null) {
+            for (Fun fun : prog.fun) {
+                funReturn.put(fun.nome, fun.retorno);
+            }
+        }
+        
+        if (prog.fun != null) {
+            for (Fun fun : prog.fun) {
+                emitirFuncao(sb, fun, funReturn);
+                sb.append("\n");
+            }
+        }
+        
+        emitirMain(sb, prog.main, funReturn);
+        return sb.toString();
+    }
+    
+    private static void emitirFuncao(StringBuilder sb, Fun fun, Map<String, String> funReturn) {
+        sb.append(tipoC(fun.retorno)).append(" ").append(fun.nome).append("(");
+        
+        if (fun.params != null) {
+            for (int i = 0; i < fun.params.size(); i++) {
+                ParamFormalFun p = fun.params.get(i);
+                if (i > 0) sb.append(", ");
+                sb.append(tipoC(p.type)).append(" ").append(p.var);
+            }
+        }
+        sb.append(") {\n");
+        
+        Map<String, String> env = new HashMap<String, String>();
+        if (fun.params != null) {
+            for (ParamFormalFun p : fun.params) {
+                env.put(p.var, p.type);
+            }
+        }
+        if (fun.vars != null) {
+            for (VarDecl v : fun.vars) {
+                env.put(v.var, v.type);
+                sb.append(indent(1)).append(tipoC(v.type)).append(" ").append(v.var).append(";\n");
+            }
+        }
+        
+        emitirComandos(sb, fun.body, 1, env, funReturn);
+        sb.append("}\n");
+    }
+    
+    private static void emitirMain(StringBuilder sb, Main main, Map<String, String> funReturn) {
+        sb.append("int main(void) {\n");
+        Map<String, String> env = new HashMap<String, String>();
+        if (main.vars != null) {
+            for (VarDecl v : main.vars) {
+                env.put(v.var, v.type);
+                sb.append(indent(1)).append(tipoC(v.type)).append(" ").append(v.var).append(";\n");
+            }
+        }
+        emitirComandos(sb, main.coms, 1, env, funReturn);
+        sb.append(indent(1)).append("return 0;\n");
+        sb.append("}\n");
+    }
+    
+    private static void emitirComandos(StringBuilder sb, ArrayList<Comando> coms, int nivel,
+                                       Map<String, String> env, Map<String, String> funReturn) {
+        if (coms == null) return;
+        for (Comando c : coms) {
+            emitirComando(sb, c, nivel, env, funReturn);
+        }
+    }
+    
+    private static void emitirComando(StringBuilder sb, Comando c, int nivel,
+                                      Map<String, String> env, Map<String, String> funReturn) {
+        if (c instanceof CAtribuicao) {
+            CAtribuicao cmd = (CAtribuicao) c;
+            sb.append(indent(nivel)).append(cmd.var).append(" = ")
+                .append(emitirExp(cmd.exp, env, funReturn)).append(";\n");
+            return;
+        }
+        if (c instanceof CReadInput) {
+            CReadInput cmd = (CReadInput) c;
+            String tipo = env.getOrDefault(cmd.var, "Float");
+            String fmt = tipo.equals("Bool") ? "%d" : "%f";
+            sb.append(indent(nivel)).append("scanf(\"").append(fmt).append("\", &")
+                .append(cmd.var).append(");\n");
+            return;
+        }
+        if (c instanceof CPrint) {
+            CPrint cmd = (CPrint) c;
+            String tipo = inferirTipo(cmd.exp, env, funReturn);
+            String fmt = tipo.equals("Bool") ? "%d\\n" : "%f\\n";
+            sb.append(indent(nivel)).append("printf(\"").append(fmt).append("\", ")
+                .append(emitirExp(cmd.exp, env, funReturn)).append(");\n");
+            return;
+        }
+        if (c instanceof CIf) {
+            CIf cmd = (CIf) c;
+            sb.append(indent(nivel)).append("if (")
+                .append(emitirExp(cmd.exp, env, funReturn)).append(") {\n");
+            emitirComandos(sb, cmd.bloco, nivel + 1, env, funReturn);
+            sb.append(indent(nivel)).append("}\n");
+            return;
+        }
+        if (c instanceof CWhile) {
+            CWhile cmd = (CWhile) c;
+            sb.append(indent(nivel)).append("while (")
+                .append(emitirExp(cmd.exp, env, funReturn)).append(") {\n");
+            emitirComandos(sb, cmd.bloco, nivel + 1, env, funReturn);
+            sb.append(indent(nivel)).append("}\n");
+            return;
+        }
+        if (c instanceof CReturn) {
+            CReturn cmd = (CReturn) c;
+            sb.append(indent(nivel)).append("return ")
+                .append(emitirExp(cmd.exp, env, funReturn)).append(";\n");
+            return;
+        }
+        if (c instanceof CChamadaFun) {
+            CChamadaFun cmd = (CChamadaFun) c;
+            sb.append(indent(nivel)).append(cmd.fun).append("(");
+            if (cmd.args != null) {
+                for (int i = 0; i < cmd.args.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append(emitirExp(cmd.args.get(i), env, funReturn));
+                }
+            }
+            sb.append(");\n");
+        }
+    }
+    
+    private static String emitirExp(ast.Exp exp, Map<String, String> env, Map<String, String> funReturn) {
+        if (exp instanceof EFloat) {
+            return Float.toString(((EFloat) exp).value);
+        }
+        if (exp instanceof EVar) {
+            return ((EVar) exp).var;
+        }
+        if (exp instanceof ETrue) {
+            return "1";
+        }
+        if (exp instanceof EFalse) {
+            return "0";
+        }
+        if (exp instanceof EChamadaFun) {
+            EChamadaFun call = (EChamadaFun) exp;
+            StringBuilder sb = new StringBuilder();
+            sb.append(call.fun).append("(");
+            if (call.args != null) {
+                for (int i = 0; i < call.args.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append(emitirExp(call.args.get(i), env, funReturn));
+                }
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+        if (exp instanceof EOpExp) {
+            EOpExp op = (EOpExp) exp;
+            return "(" + emitirExp(op.arg1, env, funReturn) + " " + op.op + " "
+                + emitirExp(op.arg2, env, funReturn) + ")";
+        }
+        return "0";
+    }
+    
+    private static String inferirTipo(ast.Exp exp, Map<String, String> env, Map<String, String> funReturn) {
+        if (exp instanceof ETrue || exp instanceof EFalse) return "Bool";
+        if (exp instanceof EFloat) return "Float";
+        if (exp instanceof EVar) return env.getOrDefault(((EVar) exp).var, "Float");
+        if (exp instanceof EChamadaFun) {
+            return funReturn.getOrDefault(((EChamadaFun) exp).fun, "Float");
+        }
+        if (exp instanceof EOpExp) {
+            String op = ((EOpExp) exp).op;
+            if (op.equals("&&") || op.equals("||") || op.equals("==") || 
+                op.equals("<") || op.equals(">") || op.equals("<=") || op.equals(">=")) {
+                return "Bool";
+            }
+            return "Float";
+        }
+        return "Float";
+    }
+    
+    private static String tipoC(String tipo) {
+        if ("Bool".equals(tipo)) return "int";
+        if ("Void".equals(tipo)) return "void";
+        return "float";
+    }
+    
+    private static String indent(int nivel) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < nivel; i++) sb.append("    ");
+        return sb.toString();
+    }
+    
+    private static String gerarNomeSaida(String arquivo) {
+        int idx = arquivo.lastIndexOf('.');
+        if (idx > 0) return arquivo.substring(0, idx) + ".c";
+        return arquivo + ".c";
+    }
 }
 
 PARSER_END(Lovelace)
@@ -41,8 +257,6 @@ SKIP: {
     " " | "\t" | "\n" | "\r" | "\r\n"
 }
 
-/* COMENTÁRIOS */
-
 /* PALAVRAS RESERVADAS */
 TOKEN : {
     < MAIN: "main" >
@@ -50,6 +264,7 @@ TOKEN : {
   | < END: "end" >
   | < LET: "let" >
   | < IF: "if" >
+  | < ELSE: "else" >
   | < WHILE: "while" >
   | < READ: "read" >
   | < RETURN: "return" >
@@ -74,11 +289,13 @@ TOKEN : {
   | < FALSE: "false" >
 }
 
-/* operadores (inclui lógicos &&, || e relacionais etc) */
+/* operadores */
 TOKEN : {
     < AND: "&&" >
   | < OR: "||" >
   | < IGUAL: "==" >
+  | < MENOR_IGUAL: "<=" >
+  | < MAIOR_IGUAL: ">=" >
   | < MENOR: "<" >
   | < MAIOR: ">" >
   | < MAIS: "+" >
@@ -87,24 +304,26 @@ TOKEN : {
   | < DIV: "/" >
 }
 
-/* atribuição token (:=) e vírgula já acima */
+/* atribuicao */
 TOKEN : {
     < ATRIBUICAO: ":=" >
 }
 
-/* identificador conforme convenção:
-   letra (letra|digito)* ( "_" (letra|digito)+ )* 
-   - permite partes finais com underscore seguidas de letras/dígitos
-*/
+/* string literal */
+TOKEN : {
+    < STRING: "\"" (~["\""])* "\"" >
+}
+
+/* identificador */
 TOKEN : {
     < IDENTIFICADOR:
-        (["a"-"z","A"-"Z"]) 
+        (["a"-"z","A"-"Z"])
         (["a"-"z","A"-"Z","0"-"9"])*
         ( ("_" (["a"-"z","A"-"Z","0"-"9"])+ ) )*
     >
 }
 
-/* número literal: digitos ( .digitos )? ( [Ee] (+|-)? digitos )? */
+/* numero literal */
 TOKEN : {
     < NUM:
         (["0"-"9"])+
@@ -113,7 +332,7 @@ TOKEN : {
     >
 }
 
-/* ANÁLISE LÉXICA */
+/* ANALISE LEXICA */
 void Analise(): {
     Token t;
 } {
@@ -121,55 +340,43 @@ void Analise(): {
         try {
             while (true) {
                 t = getNextToken();
-                
                 if (t.kind == EOF) break;
-                
                 switch (t.kind) {
-                    // Palavras reservadas
-                     case MAIN: System.out.println("Palavra reservada: main"); break;
+                    case MAIN: System.out.println("Palavra reservada: main"); break;
                     case BEGIN: System.out.println("Palavra reservada: begin"); break;
                     case END: System.out.println("Palavra reservada: end"); break;
                     case LET: System.out.println("Palavra reservada: let"); break;
                     case IF: System.out.println("Palavra reservada: if"); break;
+                    case ELSE: System.out.println("Palavra reservada: else"); break;
                     case WHILE: System.out.println("Palavra reservada: while"); break;
                     case READ: System.out.println("Palavra reservada: read"); break;
                     case RETURN: System.out.println("Palavra reservada: return"); break;
                     case PRINT: System.out.println("Palavra reservada: print"); break;
                     case DEF: System.out.println("Palavra reservada: def"); break;
-                    
-                    // Tipos
                     case FLOAT: System.out.println("Tipo: Float"); break;
                     case BOOLEAN: System.out.println("Tipo: Bool"); break;
                     case VOID: System.out.println("Tipo: Void"); break;
-                    
-                    // Valores booleanos
                     case TRUE: System.out.println("Valor booleano: true"); break;
                     case FALSE: System.out.println("Valor booleano: false"); break;
-                    
-                    // Operadores
-                    case MAIS: System.out.println("Operador aritmético: +"); break;
-                    case MENOS: System.out.println("Operador aritmético: -"); break;
-                    case MULT: System.out.println("Operador aritmético: *"); break;
-                    case DIV: System.out.println("Operador aritmético: /"); break;
-                    case AND: System.out.println("Operador lógico: &&"); break;
-                    case OR: System.out.println("Operador lógico: ||"); break;
+                    case MAIS: System.out.println("Operador aritmetico: +"); break;
+                    case MENOS: System.out.println("Operador aritmetico: -"); break;
+                    case MULT: System.out.println("Operador aritmetico: *"); break;
+                    case DIV: System.out.println("Operador aritmetico: /"); break;
+                    case AND: System.out.println("Operador logico: &&"); break;
+                    case OR: System.out.println("Operador logico: ||"); break;
                     case IGUAL: System.out.println("Operador relacional: =="); break;
                     case MENOR: System.out.println("Operador relacional: <"); break;
                     case MAIOR: System.out.println("Operador relacional: >"); break;
-                    case ATRIBUICAO: System.out.println("Operador de atribuição: :="); break;
-
-                    // Delimitadores e pontuação
-                    case ABRE_PAR: System.out.println("Abre parênteses: ("); break;
-                    case FECHA_PAR: System.out.println("Fecha parênteses: )"); break;
-                    case VIRGULA: System.out.println("Vírgula: ,"); break;
-                    case PONTO_VIRGULA: System.out.println("Ponto e vírgula: ;"); break;
-
-                    // Identificador
+                    case MENOR_IGUAL: System.out.println("Operador relacional: <="); break;
+                    case MAIOR_IGUAL: System.out.println("Operador relacional: >="); break;
+                    case ATRIBUICAO: System.out.println("Operador de atribuicao: :="); break;
+                    case ABRE_PAR: System.out.println("Abre parenteses: ("); break;
+                    case FECHA_PAR: System.out.println("Fecha parenteses: )"); break;
+                    case VIRGULA: System.out.println("Virgula: ,"); break;
+                    case PONTO_VIRGULA: System.out.println("Ponto e virgula: ;"); break;
                     case IDENTIFICADOR: System.out.println("Identificador: " + t.image); break;
-
-                    // Número literal
-                    case NUM: System.out.println("Número: " + t.image); break;
-
+                    case NUM: System.out.println("Numero: " + t.image); break;
+                    case STRING: System.out.println("String: " + t.image); break;
                     default: System.out.println("Token desconhecido: " + t.image); break;
                 }
             }
@@ -179,205 +386,164 @@ void Analise(): {
     }
 }
 
-/* ANÁLISE SINTÁTICA */
+/* ANALISE SINTATICA */
 
-// Função inicial Lovelace
-Prog Lovelace () :
-{Main main=null; ArrayList<Fun> funs = null;}
+Prog Lovelace() :
+{Main main=null; ArrayList<Fun> funs = new ArrayList<Fun>(); Fun f=null;}
 {
-
-main=LovMain() (funs=Func())?
-<EOF>
-
-{return new Prog(main,funs);}
-
+    (f=Func() {funs.add(f);})* main=LovMain() <EOF>
+    {return new Prog(main,funs);}
 }
 
-// Main
-Main LovMain () :
-{public ArrayList<VarDecl> vars=null;
- public ArrayList<Comando> coms=null;}
+Main LovMain() :
+{ArrayList<VarDecl> vars=null; ArrayList<Comando> coms=null;}
 {
-
-<MAIN> <ABRE_PAR> <FECHA_PAR> <BEGIN> vars=VarDecls() coms=SeqComandos() <END>
-
-{return new Main(vars,coms);}
+    <MAIN> <ABRE_PAR> <FECHA_PAR> <BEGIN> vars=VarDecls() coms=SeqComandos() <END>
+    {return new Main(vars,coms);}
 }
-
 
 ArrayList<VarDecl> VarDecls() :
-{ArrayList<VarDecl> decls = new ArrayList<VarDecl>(); String nome=null; String tipo=null;} // Lista dos comandos na classe designada
+{ArrayList<VarDecl> decls = new ArrayList<VarDecl>(); Token nome=null; String tipo=null;}
 {
-
-(<LET> tipo=Tipo() nome=<IDENTIFICADOR> <PONTO_VIRGULA>
-
- {
-     decls.add(new VarDecl(tipo,nome.image);)
-
- }
-)*
-
-{return decls;}
-
+    (<LET> tipo=Tipo() nome=<IDENTIFICADOR> <PONTO_VIRGULA>
+     {decls.add(new VarDecl(tipo,nome.image));}
+    )*
+    {return decls;}
 }
 
-void Tipo() :
-{}
+String Tipo() :
+{Token t;}
 {
-
-<FLOAT>
-| <BOOLEAN>
-| <VOID>
-
+    t=<FLOAT> {return "Float";}
+  | t=<BOOLEAN> {return "Bool";}
+  | t=<VOID> {return "Void";}
 }
 
 ArrayList<Comando> SeqComandos() :
-{ArrayList<Comando> comandos = new ArrayList<Comando>();}  // Lista dos comandos na classe designada
+{ArrayList<Comando> comandos = new ArrayList<Comando>(); Comando c=null;}
 {
-
-//Com() SeqComandosL()
-Com()*
-
+    (c=Com() {comandos.add(c);})*
+    {return comandos;}
 }
-
-/*void SeqComandosL() :
-{}
-{
-
-(Com() SeqComandosL())?
-
-}*/
 
 Comando Com() :
-{Comando}
+{Token id=null; Token t=null; ast.Exp exp=null; ArrayList<Comando> bloco=null;}
 {
-
-<IDENTIFICADOR> ComId()
-| <IF> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
-| <WHILE> Exp() <BEGIN> SeqComandos() <END> <PONTO_VIRGULA>
-| <RETURN> Exp() <PONTO_VIRGULA>
-| <PRINT> Exp() <PONTO_VIRGULA>
-
+    id=<IDENTIFICADOR> {return ComId(id);}
+  | t=<IF> exp=Exp() <BEGIN> bloco=SeqComandos() <END> <PONTO_VIRGULA>
+    {return new CIf(t.beginLine,exp,bloco);}
+  | t=<WHILE> exp=Exp() <BEGIN> bloco=SeqComandos() <END> <PONTO_VIRGULA>
+    {return new CWhile(t.beginLine,exp,bloco);}
+  | t=<RETURN> exp=Exp() <PONTO_VIRGULA>
+    {return new CReturn(t.beginLine,exp);}
+  | t=<PRINT> (exp=Exp() | t=<STRING>) <PONTO_VIRGULA>
+    {return new CPrint(t.beginLine,exp);}
 }
 
-String ComId() : // acho que é isso, checar dps 
-{}
+Comando ComId(Token idTok) :
+{ast.Exp exp=null; ArrayList<ast.Exp> args=null;}
 {
-
-<ATRIBUICAO> ComIdPar()
-| <ABRE_PAR> (ListaExp())? <FECHA_PAR> <PONTO_VIRGULA>
-
+    <ATRIBUICAO>
+    (
+        exp=Exp() <PONTO_VIRGULA>
+        {return new CAtribuicao(idTok.beginLine,idTok.image,exp);}
+      | <READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
+        {return new CReadInput(idTok.beginLine,idTok.image);}
+    )
+  | <ABRE_PAR> (args=ListaExp())? <FECHA_PAR> <PONTO_VIRGULA>
+    {
+        if (args == null) args = new ArrayList<ast.Exp>();
+        return new CChamadaFun(idTok.beginLine,idTok.image,args);
+    }
 }
 
-void ComIdPar() :
-{}
+ast.Exp Exp() :
+{ast.Exp exp=null;}
 {
-
-Exp() <PONTO_VIRGULA>
-|<READ> <ABRE_PAR> <FECHA_PAR> <PONTO_VIRGULA>
-
-} 
-
-void Exp() :
-{}
-{
-
-<ABRE_PAR> ExpD() Op() ExpD() <FECHA_PAR>
-| Fator()
-
+    exp=ExpOr() {return exp;}
 }
 
-void ExpD() :
-{}
+ast.Exp ExpOr() :
+{ast.Exp left=null; ast.Exp right=null; Token op=null;}
 {
-
-Fator() ExpDD()
-
+    left=ExpAnd()
+    (op=<OR> right=ExpAnd() {left = new EOpExp(op.image,left,right);})*
+    {return left;}
 }
 
-void ExpDD() :
-{}
+ast.Exp ExpAnd() :
+{ast.Exp left=null; ast.Exp right=null; Token op=null;}
 {
-
-(Op() Exp())?
-
+    left=ExpRel()
+    (op=<AND> right=ExpRel() {left = new EOpExp(op.image,left,right);})*
+    {return left;}
 }
 
-void Fator() :
-{}
+ast.Exp ExpRel() :
+{ast.Exp left=null; ast.Exp right=null; Token op=null;}
 {
-
-<IDENTIFICADOR> FatorId()
-| <NUM>
-| <TRUE>
-| <FALSE>
-
+    left=ExpAdd()
+    ((op=<IGUAL> | op=<MENOR> | op=<MAIOR> | op=<MENOR_IGUAL> | op=<MAIOR_IGUAL>) 
+     right=ExpAdd() {left = new EOpExp(op.image,left,right);})*
+    {return left;}
 }
 
-void FatorId() :
-{}
+ast.Exp ExpAdd() :
+{ast.Exp left=null; ast.Exp right=null; Token op=null;}
 {
-
-(<ABRE_PAR> (ListaExp()) <FECHA_PAR>)?
-
+    left=ExpMul()
+    ((op=<MAIS> | op=<MENOS>) right=ExpMul() {left = new EOpExp(op.image,left,right);})*
+    {return left;}
 }
 
-void Op() :
-{}
+ast.Exp ExpMul() :
+{ast.Exp left=null; ast.Exp right=null; Token op=null;}
 {
-
-<MAIS>
-| <MENOS>
-| <MULT>
-| <DIV>
-
+    left=Fator()
+    ((op=<MULT> | op=<DIV>) right=Fator() {left = new EOpExp(op.image,left,right);})*
+    {return left;}
 }
 
-void ListaExp() :
-{}
+ast.Exp Fator() :
+{Token id=null; Token numTok=null; ast.Exp inner=null; ArrayList<ast.Exp> args=null;}
 {
-
-Exp() ListaExpL()
-
+    id=<IDENTIFICADOR>
+    (
+        LOOKAHEAD(1) <ABRE_PAR> (args=ListaExp())? <FECHA_PAR>
+        {
+            if (args == null) args = new ArrayList<ast.Exp>();
+            return new EChamadaFun(id.image,args);
+        }
+      | {return new EVar(id.image);}
+    )
+  | numTok=<NUM> {return new EFloat(Float.parseFloat(numTok.image));}
+  | <TRUE> {return new ETrue();}
+  | <FALSE> {return new EFalse();}
+  | <ABRE_PAR> inner=Exp() <FECHA_PAR> {return inner;}
 }
 
-void ListaExpL() :
-{}
+ArrayList<ast.Exp> ListaExp() :
+{ArrayList<ast.Exp> args = new ArrayList<ast.Exp>(); ast.Exp e=null;}
 {
-
-(<VIRGULA> Exp() ListaExpL())?
-
+    e=Exp() {args.add(e);} (<VIRGULA> e=Exp() {args.add(e);})*
+    {return args;}
 }
 
-void Func() :
-{}
+Fun Func() :
+{String tipo=null; Token nome=null; ArrayList<ParamFormalFun> params=null; ArrayList<VarDecl> vars=null; ArrayList<Comando> body=null;}
 {
-
-<DEF> Tipo() <IDENTIFICADOR> <ABRE_PAR> (ListaArg())? <FECHA_PAR> <BEGIN> VarDecls() SeqComandos()
-<END> FuncL()
-
+    <DEF> tipo=Tipo() nome=<IDENTIFICADOR> <ABRE_PAR> (params=ListaArg())? <FECHA_PAR> <BEGIN>
+    vars=VarDecls() body=SeqComandos() <END>
+    {
+        if (params == null) params = new ArrayList<ParamFormalFun>();
+        return new Fun(nome.image,params,tipo,vars,body);
+    }
 }
 
-void FuncL() :
-{}
+ArrayList<ParamFormalFun> ListaArg() :
+{ArrayList<ParamFormalFun> params = new ArrayList<ParamFormalFun>(); String tipo=null; Token nome=null;}
 {
-
-(Func() FuncL())?
-
-}
-
-void ListaArg() :
-{}
-{
-
-Tipo() <IDENTIFICADOR> ListaArgL()
-
-}
-
-void ListaArgL() :
-{}
-{
-
-(<VIRGULA> Tipo() <IDENTIFICADOR> ListaArgL())?
-
+    tipo=Tipo() nome=<IDENTIFICADOR> {params.add(new ParamFormalFun(tipo,nome.image));}
+    (<VIRGULA> tipo=Tipo() nome=<IDENTIFICADOR> {params.add(new ParamFormalFun(tipo,nome.image));})*
+    {return params;}
 }

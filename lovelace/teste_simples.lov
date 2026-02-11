@@ -1,0 +1,18 @@
+def Float soma(Float a, Float b)
+begin
+    let Float r;
+    r := (a + b);
+    return r;
+end
+
+main()
+begin
+    let Float x;
+    let Float y;
+    let Float resultado;
+    
+    x := 5;
+    y := 3;
+    resultado := soma(x, y);
+    print resultado;
+end
