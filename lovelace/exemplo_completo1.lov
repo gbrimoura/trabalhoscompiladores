@@ -1,0 +1,84 @@
+def Float fatorial(Float n)
+begin
+    let Float resultado;
+    let Float contador;
+    
+    resultado := 1;
+    contador := n;
+    
+    while (contador > 1) begin
+        resultado := (resultado * contador);
+        contador := (contador - 1);
+    end;
+    
+    return resultado;
+end
+
+def Bool ehPar(Float numero)
+begin
+    let Float divisao;
+    let Float resto;
+    let Bool resultado;
+    
+    divisao := (numero / 2);
+    resto := (numero - (divisao * 2));
+    
+    if (resto == 0) begin
+        resultado := true;
+    end;
+    
+    if (resto > 0) begin
+        resultado := false;
+    end;
+    
+    return resultado;
+end
+
+def Float potencia(Float base, Float expoente)
+begin
+    let Float resultado;
+    let Float contador;
+    
+    resultado := 1;
+    contador := 0;
+    
+    while (contador < expoente) begin
+        resultado := (resultado * base);
+        contador := (contador + 1);
+    end;
+    
+    return resultado;
+end
+
+def Void mostraResultado(Float valor)
+begin
+    print valor;
+end
+
+main()
+begin
+    let Float numero;
+    let Float fat;
+    let Float pot;
+    let Bool par;
+    
+    numero := 5;
+    
+    fat := fatorial(numero);
+    print fat;
+    
+    pot := potencia(2, 3);
+    print pot;
+    
+    par := ehPar(numero);
+    
+    if (par == true) begin
+        print 1;
+    end;
+    
+    if (par == false) begin
+        print 0;
+    end;
+    
+    mostraResultado(numero);
+end

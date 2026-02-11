@@ -1,0 +1,124 @@
+def Float media(Float a, Float b, Float c)
+begin
+    let Float soma;
+    let Float resultado;
+    
+    soma := ((a + b) + c);
+    resultado := (soma / 3);
+    
+    return resultado;
+end
+
+def Float maximo(Float x, Float y)
+begin
+    let Float maior;
+    
+    maior := x;
+    
+    if (y > x) begin
+        maior := y;
+    end;
+    
+    return maior;
+end
+
+def Float minimo(Float x, Float y)
+begin
+    let Float menor;
+    
+    menor := x;
+    
+    if (y < x) begin
+        menor := y;
+    end;
+    
+    return menor;
+end
+
+def Bool dentroIntervalo(Float valor, Float limiteInf, Float limiteSup)
+begin
+    let Bool resultado;
+    let Bool maiorIgualInf;
+    let Bool menorIgualSup;
+    
+    resultado := false;
+    
+    if (valor >= limiteInf) begin
+        maiorIgualInf := true;
+    end;
+    
+    if (valor < limiteInf) begin
+        maiorIgualInf := false;
+    end;
+    
+    if (valor <= limiteSup) begin
+        menorIgualSup := true;
+    end;
+    
+    if (valor > limiteSup) begin
+        menorIgualSup := false;
+    end;
+    
+    if ((maiorIgualInf == true) && (menorIgualSup == true)) begin
+        resultado := true;
+    end;
+    
+    return resultado;
+end
+
+def Float calculaArea(Float largura, Float altura)
+begin
+    let Float area;
+    area := (largura * altura);
+    return area;
+end
+
+main()
+begin
+    let Float nota1;
+    let Float nota2;
+    let Float nota3;
+    let Float mediaAluno;
+    let Float valorMax;
+    let Float valorMin;
+    let Bool aprovado;
+    let Float largura;
+    let Float altura;
+    let Float area;
+    
+    nota1 := 7;
+    nota2 := 8;
+    nota3 := 6;
+    
+    mediaAluno := media(nota1, nota2, nota3);
+    print mediaAluno;
+    
+    valorMax := maximo(nota1, nota2);
+    print valorMax;
+    
+    valorMin := minimo(nota2, nota3);
+    print valorMin;
+    
+    aprovado := dentroIntervalo(mediaAluno, 6, 10);
+    
+    if (aprovado == true) begin
+        print 1;
+    end;
+    
+    if (aprovado == false) begin
+        print 0;
+    end;
+    
+    largura := 5;
+    altura := 3;
+    area := calculaArea(largura, altura);
+    print area;
+    
+    if ((area > 10) && (area < 20)) begin
+        print 1;
+    end;
+    
+    if ((area <= 10) || (area >= 20)) begin
+        print 0;
+    end;
+end
